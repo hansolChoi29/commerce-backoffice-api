@@ -13,7 +13,6 @@ import static org.junit.jupiter.api.Assertions.*;
 class ApiResponseTest {
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-
     @Test
     @DisplayName("ApiResponse 직렬화")
     void success_response_serializes() throws Exception {
@@ -27,12 +26,10 @@ class ApiResponseTest {
     @Test
     @DisplayName("예상 포맷과 다를 경우 예외")
     void fail_response() throws Exception {
-        ApiResponse<ErrorItem> response = ApiResponse.fail("ERROR", "400", null);
+        ApiResponse<ErrorItem> response = ApiResponse.fail("ERROR", 400, null);
         String json = objectMapper.writeValueAsString(response);
 
         assertThat(json).contains("\"success\":false");
-
-        // assertThat(json).contains("\"data\":\"400\"");
         assertThat(json).contains("ERROR");
     }
 }

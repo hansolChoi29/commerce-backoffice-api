@@ -2,13 +2,18 @@ package com.example.ledger.global.exception;
 
 import java.util.List;
 
-public class ErrorItem {
+public class ErrorException extends RuntimeException {
+    private final int status;
     private final int code;
     private final List<Field> errors;
-
-    public ErrorItem(int code, List<Field> errors) {
+    public ErrorException(int status ,int code, List<Field> errors) {
+        this.status=status;
         this.code = code;
         this.errors = errors;
+    }
+
+    public int getStatus() {
+        return status;
     }
 
     public int getCode() {

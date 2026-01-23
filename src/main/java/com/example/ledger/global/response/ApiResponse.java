@@ -20,7 +20,7 @@ public class ApiResponse<T> {
         return new <T>ApiResponse<T>(true, message, data);
     }
 
-    public static ApiResponse<ErrorItem> fail(String message, String code, List<Field> errors) {
+    public static ApiResponse<ErrorItem> fail(String message, int code, List<Field> errors) {
         return new ApiResponse(false, message, new ErrorItem(code, errors));
     }
 
