@@ -25,8 +25,8 @@ public class GoodsReceiptItem {
     private Long productId;
 
     @Column(name = "received_qty", nullable = false)
-    private Long receivedQty;
+    private Long receivedQty; // 실제 입고 수량
 
     @Column(name = "unit_cost", nullable = false)
-    private BigDecimal unitcost;
+    private BigDecimal unitcost; // 발주 단가 (매입 단가)
 }

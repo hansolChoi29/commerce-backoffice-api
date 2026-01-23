@@ -2,6 +2,8 @@ package com.example.ledger.domain.sales.entity;
 
 import jakarta.persistence.*;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Table(name = "sales_order")
 public class SalesOrder {
@@ -16,4 +18,16 @@ public class SalesOrder {
     @Column(name = "sales_order_id")
     private Long id;
 
+    @Column(name = "so_no", nullable = false)
+    private String soNo; // 사람이 보는 매출 번호
+
+    @Column(name = "partner_id", nullable = false)
+    private Long partnerId;
+
+    @Column(name = "status", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private SalesOrderStatus status;
+
+    @Column(name = "soldAt", nullable = false)
+    private LocalDateTime soldAt;
 }

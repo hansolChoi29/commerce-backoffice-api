@@ -17,7 +17,7 @@ public class PurchaseOrder {
     private Long id;
 
     @Column(name = "po_no")
-    private String poNo;
+    private String poNo; // 사람이 보는 발주 번호
 
     @Column(name = "partner_id", nullable = false)
     private Long partnerId; // TODO : 연관관계

@@ -17,7 +17,7 @@ public class GoodsReceipt {
     private Long id;
 
     @Column(name = "gr_no", nullable = false)
-    private String grNo;
+    private String grNo; // 사람이 보는 입고 번호
 
     @Column(name = "purchase_order_id", nullable = false)
     private Long purchaseOrderId; // TODO
