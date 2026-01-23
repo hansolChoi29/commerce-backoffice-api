@@ -18,7 +18,7 @@ public class PurchaseOrderItem {
     private Long id;
 
     @Column(name = "purchase_order_id", nullable = false)
-    private Long purchaseOrderId;
+    private Long purchaseOrderId; // TODO
 
     @Column(name = "product_id", nullable = false)
     private Long productId;

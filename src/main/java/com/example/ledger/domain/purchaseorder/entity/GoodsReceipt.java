@@ -2,6 +2,8 @@ package com.example.ledger.domain.purchaseorder.entity;
 
 import jakarta.persistence.*;
 
+import java.time.LocalDateTime;
+
 @Table(name = "goods_receipt")
 @Entity
 public class GoodsReceipt {
@@ -13,4 +15,17 @@ public class GoodsReceipt {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "goods_receipt_id")
     private Long id;
+
+    @Column(name = "gr_no", nullable = false)
+    private String grNo;
+
+    @Column(name = "purchase_order_id", nullable = false)
+    private Long purchaseOrderId; // TODO
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false)
+    private GoodsReceiptStatus status;
+
+    @Column(name = "received_at", nullable = false)
+    private LocalDateTime receivedAt;
 }

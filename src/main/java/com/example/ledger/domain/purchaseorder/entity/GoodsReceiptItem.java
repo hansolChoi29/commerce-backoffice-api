@@ -2,6 +2,8 @@ package com.example.ledger.domain.purchaseorder.entity;
 
 import jakarta.persistence.*;
 
+import java.math.BigDecimal;
+
 
 @Entity
 @Table(name = "goods_receipt_item")
@@ -15,4 +17,16 @@ public class GoodsReceiptItem {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "goods_receipt_item_id")
     private Long id;
+
+    @Column(name = "goods_receipt_id", nullable = false)
+    private Long goodsReceiptId; // TODO
+
+    @Column(name = "product_id", nullable = false)
+    private Long productId;
+
+    @Column(name = "received_qty", nullable = false)
+    private Long receivedQty;
+
+    @Column(name = "unit_cost", nullable = false)
+    private BigDecimal unitcost;
 }
