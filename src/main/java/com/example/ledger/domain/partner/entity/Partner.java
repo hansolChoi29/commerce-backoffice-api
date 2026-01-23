@@ -17,11 +17,14 @@ public class Partner {
     private Long id;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "type", nullable = false)
+    @Column(name = "type", nullable = false, length = 20)
     private PartnerType type;
 
+    @Column(name = "name", nullable = false, length = 255)
+    private String name;
+
     @Enumerated(EnumType.STRING)
-    @Column(name = "status", nullable = false)
+    @Column(name = "status", nullable = false, length = 20)
     private PartnerStatus status;
 
     @Column(name = "created_at", nullable = false)

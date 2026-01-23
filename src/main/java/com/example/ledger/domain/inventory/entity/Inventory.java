@@ -25,5 +25,8 @@ public class Inventory {
 
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
+
+    @Column(name="product_id")
+    private Long productId; // TODO : 연관관계
 }
 
