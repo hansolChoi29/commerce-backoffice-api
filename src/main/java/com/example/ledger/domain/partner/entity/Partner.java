@@ -2,6 +2,8 @@ package com.example.ledger.domain.partner.entity;
 
 import jakarta.persistence.*;
 
+import java.time.LocalDateTime;
+
 
 @Entity
 @Table(name = "partner")
@@ -13,4 +15,15 @@ public class Partner {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "partner_id")
     private Long id;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "type", nullable = false)
+    private PartnerType type;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false)
+    private PartnerStatus status;
+
+    @Column(name = "created_at", nullable = false)
+    private LocalDateTime createdAt;
 }

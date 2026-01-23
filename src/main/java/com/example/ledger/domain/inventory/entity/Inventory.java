@@ -2,6 +2,8 @@ package com.example.ledger.domain.inventory.entity;
 
 import jakarta.persistence.*;
 
+import java.time.LocalDateTime;
+
 
 @Entity
 @Table(name = "inventory")
@@ -14,5 +16,14 @@ public class Inventory {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "inventory_id")
     private Long id;
+
+    @Column(name = "on_hand_qty", nullable = false)
+    private int onHandQty;
+
+    @Column(name = "resrved_qty", nullable = false)
+    private int reservedQty;
+
+    @Column(name = "updated_at", nullable = false)
+    private LocalDateTime updatedAt;
 }
 
