@@ -2,6 +2,9 @@ package com.example.ledger.domain.sales.entity;
 
 import jakarta.persistence.*;
 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+
 @Entity
 @Table(name = "sales_order_item")
 public class SalesOrderItem {
@@ -14,4 +17,16 @@ public class SalesOrderItem {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "sales_order_item_id")
     private Long id;
+
+    @Column(name = "sales_order_id", nullable = false)
+    private Long salesOrderId;
+    // TODO
+    @Column(name = "product_id", nullable = false)
+    private Long productId;
+
+    @Column(name = "sale_qty", nullable = false)
+    private BigDecimal saleQty; // 판매 수량
+
+    @Column(name = "unit_sale_price", nullable = false)
+    private LocalDateTime unitSalePrice; // 판매 단가
 }

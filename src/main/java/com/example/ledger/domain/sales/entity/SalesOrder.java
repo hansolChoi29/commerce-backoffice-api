@@ -28,6 +28,6 @@ public class SalesOrder {
     @Enumerated(EnumType.STRING)
     private SalesOrderStatus status;
 
-    @Column(name = "soldAt", nullable = false)
-    private LocalDateTime soldAt;
+    @Column(name = "sold_at", nullable = false)
+    private LocalDateTime soldAt; // 판매 발생 시각
 }
