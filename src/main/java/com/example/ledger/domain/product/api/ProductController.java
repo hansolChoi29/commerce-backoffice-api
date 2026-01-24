@@ -56,6 +56,7 @@ public class ProductController {
         FindOneCommand command = new FindOneCommand(id);
         FindOneResult result = productService.findOne(command);
         FindOneResponse response = new FindOneResponse(
+                result.getId(),
                 result.getSku(),
                 result.getName(),
                 result.getStatus(),

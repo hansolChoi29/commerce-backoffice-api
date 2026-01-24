@@ -45,9 +45,19 @@ public class ProductService {
                 saved.getCreatedAt()
         );
     }
+
     public FindOneResult findOne(FindOneCommand command){
+        Product product = productRepository.findById(command.getId())
+                .orElseThrow(()-> new IllegalArgumentException("존재하지 않는 상품입니다."));
 
-
-        return new FindOneResult();
+        return new FindOneResult(
+                product.getId(),
+                product.getSku(),
+                product.getName(),
+                product.getStatus(),
+                product.getSalePrice(),
+                product.getCostPrice(),
+                product.getCreatedAt()
+        );
     }
 }
