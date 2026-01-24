@@ -2,7 +2,9 @@ package com.example.ledger.domain.product.application;
 
 import com.example.ledger.domain.product.application.sku.SkuGenerator;
 import com.example.ledger.domain.product.dto.command.CreateCommand;
+import com.example.ledger.domain.product.dto.command.FindOneCommand;
 import com.example.ledger.domain.product.dto.result.CreateResult;
+import com.example.ledger.domain.product.dto.result.FindOneResult;
 import com.example.ledger.domain.product.entity.Product;
 import com.example.ledger.domain.product.infra.ProductRepository;
 import org.springframework.stereotype.Service;
@@ -42,5 +44,10 @@ public class ProductService {
                 saved.getCostPrice(),
                 saved.getCreatedAt()
         );
+    }
+    public FindOneResult findOne(FindOneCommand command){
+
+
+        return new FindOneResult();
     }
 }

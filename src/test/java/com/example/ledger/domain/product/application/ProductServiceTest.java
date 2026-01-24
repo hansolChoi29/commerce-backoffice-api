@@ -2,6 +2,8 @@ package com.example.ledger.domain.product.application;
 
 import com.example.ledger.domain.product.application.sku.SkuGenerator;
 import com.example.ledger.domain.product.dto.command.CreateCommand;
+import com.example.ledger.domain.product.dto.command.FindOneCommand;
+import com.example.ledger.domain.product.dto.result.FindOneResult;
 import com.example.ledger.domain.product.entity.Product;
 import com.example.ledger.domain.product.infra.ProductRepository;
 import org.junit.jupiter.api.DisplayName;
@@ -12,7 +14,11 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.Optional;
 
+import static com.example.ledger.domain.product.entity.ProductStatus.ACTIVE;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
@@ -83,4 +89,27 @@ class ProductServiceTest {
         verify(skuGenerator, never()).generate(); // 호출되면 안 된다
         verify(productRepository, never()).save(any(Product.class));
     }
+
+    @Test
+    @DisplayName("단건 조히 성공")
+    void findOne_success() {
+        Long id = 1L;
+        Product product = new Product(
+                id,
+                "SKU-01234567891",
+                "name",
+                ACTIVE,
+                BigDecimal.valueOf(12000),
+                BigDecimal.valueOf(13000),
+                LocalDateTime.now()
+        );
+
+        given(productRepository.findById(id)).willReturn(Optional.of(product));
+
+        FindOneResult result = productService.findOne(new FindOneCommand(id));
+
+        assertThat(result.getId()).isEqualTo(id);
+        verify(productRepository).findById(id);
+    }
+
 }

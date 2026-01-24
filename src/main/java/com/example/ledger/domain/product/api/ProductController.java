@@ -3,15 +3,15 @@ package com.example.ledger.domain.product.api;
 
 import com.example.ledger.domain.product.application.ProductService;
 import com.example.ledger.domain.product.dto.command.CreateCommand;
+import com.example.ledger.domain.product.dto.command.FindOneCommand;
 import com.example.ledger.domain.product.dto.request.CreateRequest;
 import com.example.ledger.domain.product.dto.response.CreateResponse;
+import com.example.ledger.domain.product.dto.response.FindOneResponse;
 import com.example.ledger.domain.product.dto.result.CreateResult;
+import com.example.ledger.domain.product.dto.result.FindOneResult;
 import com.example.ledger.global.response.ApiResponse;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/products")
@@ -47,5 +47,22 @@ public class ProductController {
         return ResponseEntity.ok(ApiResponse.ok(
                 "등록이 완료되었습니다.", response
         ));
+    }
+
+    @GetMapping("{id}")
+    public ResponseEntity<ApiResponse<FindOneResponse>> findOne(
+            @PathVariable Long id
+    ) {
+        FindOneCommand command = new FindOneCommand(id);
+        FindOneResult result = productService.findOne(command);
+        FindOneResponse response = new FindOneResponse(
+                result.getSku(),
+                result.getName(),
+                result.getStatus(),
+                result.getSalePrice(),
+                result.getCostPrice(),
+                result.getCreatedAt()
+        );
+        return ResponseEntity.ok(ApiResponse.ok("성공적으로 조회되었습니다.", response));
     }
 }
