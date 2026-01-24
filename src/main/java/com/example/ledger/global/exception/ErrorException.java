@@ -6,8 +6,15 @@ public class ErrorException extends RuntimeException {
     private final int status;
     private final int code;
     private final List<Field> errors;
-    public ErrorException(int status ,int code, List<Field> errors) {
-        this.status=status;
+
+    public ErrorException(
+            int status,
+            int code,
+            String message,
+            List<Field> errors
+    ) {
+        super(message);
+        this.status = status;
         this.code = code;
         this.errors = errors;
     }
