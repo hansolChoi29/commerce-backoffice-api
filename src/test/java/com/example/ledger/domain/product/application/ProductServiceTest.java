@@ -19,6 +19,7 @@ import java.util.Optional;
 
 import static com.example.ledger.domain.product.entity.ProductStatus.ACTIVE;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
@@ -91,7 +92,7 @@ class ProductServiceTest {
     }
 
     @Test
-    @DisplayName("단건 조히 성공")
+    @DisplayName("단건 조회 성공")
     void findOne_success() {
         Long id = 1L;
         Product product = new Product(
@@ -112,4 +113,16 @@ class ProductServiceTest {
         verify(productRepository).findById(id);
     }
 
+    @Test
+    @DisplayName("존재하지 않는 Id")
+    void findOne_Id_isNull(){
+        Long id = 1L;
+        given(productRepository.findById(id)).willReturn(Optional.empty());
+
+        assertThatThrownBy(() -> productService.findOne(new FindOneCommand(id)))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("존재하지 않는 상품");
+
+        verify(productRepository).findById(id);
+    }
 }
