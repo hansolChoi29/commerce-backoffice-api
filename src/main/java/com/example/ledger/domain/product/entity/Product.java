@@ -15,8 +15,8 @@ public class Product {
     @Column(name = "product_id")
     private Long id;
 
-    @Column(name = "sku", nullable = false)
-    private String sku; // 상품코드(관리목적)
+    @Column(name = "sku", unique = true, nullable = false, length = 30)
+    private String sku; // 상품코드(관리목적) - 랜덤하게
 
     @Column(name = "name", nullable = false, length = 255)
     private String name; // 상품명
@@ -82,6 +82,8 @@ public class Product {
     public LocalDateTime getCreatedAt() {
         return createdAt;
     }
+
+    // TODO : PrePersist 학습하여 적용하기
 
     public static Product create(
             String sku,

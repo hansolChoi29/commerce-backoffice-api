@@ -1,5 +1,6 @@
 package com.example.ledger.domain.product.application;
 
+import com.example.ledger.domain.product.application.sku.SkuGenerator;
 import com.example.ledger.domain.product.dto.command.CreateCommand;
 import com.example.ledger.domain.product.dto.result.CreateResult;
 import com.example.ledger.domain.product.entity.Product;
@@ -9,17 +10,20 @@ import org.springframework.stereotype.Service;
 @Service
 public class ProductService {
     private final ProductRepository productRepository;
+    private final SkuGenerator skuGenerator;
 
-    public ProductService(ProductRepository productRepository) {
+    public ProductService(
+            ProductRepository productRepository,
+            SkuGenerator skuGenerator
+    ) {
+        this.skuGenerator = skuGenerator;
         this.productRepository = productRepository;
     }
 
     public CreateResult create(CreateCommand command) {
-        if (productRepository.existsBySku(command.getSku())) {
-            throw new IllegalArgumentException("이미 있는 상품입니다.");
-        }
+        String sku = skuGenerator.generate();
         Product product = Product.create(
-                command.getSku(),
+                sku,
                 command.getName(),
                 command.getSalePrice(),
                 command.getCostPrice()
