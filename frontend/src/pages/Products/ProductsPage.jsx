@@ -13,11 +13,7 @@ export default function ProductsPage() {
 
     const fetchProducts = async (page = 0) => {
         setPending(true);
-        const res = await fetch(`
-        /products?page=${page}
-        &size=${pageInfo.size}
-        &sort=createdAt,desc`
-        );
+        const res = await fetch(`/products?page=${page}&size=${pageInfo.size}&sort=createdAt,desc`);
         const json = await res.json();
         const data = json.data;
         setItem(data.item);
@@ -27,7 +23,6 @@ export default function ProductsPage() {
             totalPages: data.totalPages,
             hasNext: data.hasNext,
         });
-        console.log("REQ page:", page, "RES page:", data.page, "hasNext:", data.hasNext);
 
         setPending(false);
     };
