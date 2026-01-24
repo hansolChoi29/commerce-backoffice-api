@@ -2,23 +2,33 @@ package com.example.ledger.domain.product.application;
 
 import com.example.ledger.domain.product.application.sku.SkuGenerator;
 import com.example.ledger.domain.product.dto.command.CreateCommand;
+import com.example.ledger.domain.product.dto.command.FindAllCommand;
 import com.example.ledger.domain.product.dto.command.FindOneCommand;
+import com.example.ledger.domain.product.dto.response.FindAllResponse;
 import com.example.ledger.domain.product.dto.result.FindOneResult;
 import com.example.ledger.domain.product.entity.Product;
 import com.example.ledger.domain.product.infra.ProductRepository;
+import com.example.ledger.global.exception.product.ProductException;
+import com.example.ledger.global.response.PageResponse;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 import static com.example.ledger.domain.product.entity.ProductStatus.ACTIVE;
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
+
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -82,7 +92,7 @@ class ProductServiceTest {
 
         // [핵심]이 예외는 터져야 한다
         assertThrows(
-                IllegalArgumentException.class,
+                ProductException.class,
                 () -> productService.create(command)
         );
 
@@ -115,14 +125,39 @@ class ProductServiceTest {
 
     @Test
     @DisplayName("존재하지 않는 Id")
-    void findOne_Id_isNull(){
+    void findOne_Id_isNull() {
         Long id = 1L;
         given(productRepository.findById(id)).willReturn(Optional.empty());
 
         assertThatThrownBy(() -> productService.findOne(new FindOneCommand(id)))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(ProductException.class)
                 .hasMessageContaining("존재하지 않는 상품");
 
         verify(productRepository).findById(id);
+    }
+
+    @Test
+    @DisplayName("게시글 전체조회 성공")
+    void findAll_success() {
+        Product p1 = Product.create("SKU-1", "name1", BigDecimal.valueOf(1200), BigDecimal.valueOf(12000));
+        Product p2 = Product.create("SKU-2", "name2", BigDecimal.valueOf(4200), BigDecimal.valueOf(92000));
+
+        Page<Product> productPage = new PageImpl<>(
+                List.of(p1, p2),
+                PageRequest.of(0, 20),
+                22
+        );
+
+        given(productRepository.findAll(any(Pageable.class)))
+                .willReturn(productPage);
+
+        FindAllCommand command = new FindAllCommand(PageRequest.of(0, 20));
+
+        PageResponse<FindAllResponse> result = productService.findAll(command);
+
+        // 해당 페이지 담긴 목록 아아템 2개여야 한다
+        assertThat(result.getItem()).hasSize(2);
+        assertThat(result.getTotalElements()).isEqualTo(22);
+        assertThat(result.isHasNext()).isTrue();
     }
 }

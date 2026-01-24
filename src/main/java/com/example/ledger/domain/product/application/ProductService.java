@@ -2,11 +2,17 @@ package com.example.ledger.domain.product.application;
 
 import com.example.ledger.domain.product.application.sku.SkuGenerator;
 import com.example.ledger.domain.product.dto.command.CreateCommand;
+import com.example.ledger.domain.product.dto.command.FindAllCommand;
 import com.example.ledger.domain.product.dto.command.FindOneCommand;
+import com.example.ledger.domain.product.dto.response.FindAllResponse;
 import com.example.ledger.domain.product.dto.result.CreateResult;
 import com.example.ledger.domain.product.dto.result.FindOneResult;
 import com.example.ledger.domain.product.entity.Product;
 import com.example.ledger.domain.product.infra.ProductRepository;
+import com.example.ledger.global.exception.product.ProductErrorCode;
+import com.example.ledger.global.exception.product.ProductException;
+import com.example.ledger.global.response.PageResponse;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -23,8 +29,8 @@ public class ProductService {
     }
 
     public CreateResult create(CreateCommand command) {
-        if(productRepository.existsByName(command.getName())){
-            throw new IllegalArgumentException("이미 존재하는 상품입니다.");
+        if (productRepository.existsByName(command.getName())) {
+            throw new ProductException(ProductErrorCode.PRODUCT_NAME_DUPLICATE);
         }
 
         String sku = skuGenerator.generate();
@@ -46,9 +52,9 @@ public class ProductService {
         );
     }
 
-    public FindOneResult findOne(FindOneCommand command){
+    public FindOneResult findOne(FindOneCommand command) {
         Product product = productRepository.findById(command.getId())
-                .orElseThrow(()-> new IllegalArgumentException("존재하지 않는 상품입니다."));
+                .orElseThrow(() -> new ProductException(ProductErrorCode.PRODUCT_NOT_FOUND));
 
         return new FindOneResult(
                 product.getId(),
@@ -59,5 +65,13 @@ public class ProductService {
                 product.getCostPrice(),
                 product.getCreatedAt()
         );
+    }
+
+    public PageResponse<FindAllResponse> findAll(FindAllCommand command) {
+        Page<FindAllResponse> page = productRepository
+                .findAll(command.getPageable())
+                .map(FindAllResponse::from);
+
+        return PageResponse.from(page);
     }
 }

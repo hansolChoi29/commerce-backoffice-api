@@ -3,13 +3,17 @@ package com.example.ledger.domain.product.api;
 
 import com.example.ledger.domain.product.application.ProductService;
 import com.example.ledger.domain.product.dto.command.CreateCommand;
+import com.example.ledger.domain.product.dto.command.FindAllCommand;
 import com.example.ledger.domain.product.dto.command.FindOneCommand;
 import com.example.ledger.domain.product.dto.request.CreateRequest;
 import com.example.ledger.domain.product.dto.response.CreateResponse;
+import com.example.ledger.domain.product.dto.response.FindAllResponse;
 import com.example.ledger.domain.product.dto.response.FindOneResponse;
 import com.example.ledger.domain.product.dto.result.CreateResult;
 import com.example.ledger.domain.product.dto.result.FindOneResult;
 import com.example.ledger.global.response.ApiResponse;
+import com.example.ledger.global.response.PageResponse;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -49,7 +53,7 @@ public class ProductController {
         ));
     }
 
-    @GetMapping("{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<FindOneResponse>> findOne(
             @PathVariable Long id
     ) {
@@ -65,5 +69,12 @@ public class ProductController {
                 result.getCreatedAt()
         );
         return ResponseEntity.ok(ApiResponse.ok("성공적으로 조회되었습니다.", response));
+    }
+
+    @GetMapping
+    public ResponseEntity<ApiResponse<PageResponse<FindAllResponse>>> findAll(Pageable pageable) {
+        FindAllCommand command = new FindAllCommand(pageable);
+        PageResponse<FindAllResponse> response = productService.findAll(command);
+        return ResponseEntity.ok(ApiResponse.ok("목록을 불러왔습니다.", response));
     }
 }
