@@ -21,6 +21,10 @@ public class ProductService {
     }
 
     public CreateResult create(CreateCommand command) {
+        if(productRepository.existsByName(command.getName())){
+            throw new IllegalArgumentException("이미 존재하는 상품입니다.");
+        }
+
         String sku = skuGenerator.generate();
         Product product = Product.create(
                 sku,
