@@ -20,10 +20,19 @@ export async function createProductApi({name, salePrice, costPrice}) {
     return json.data;
 }
 
-export async function updateProductApi() {
-
+export async function updateProductApi(id, {name, salePrice, costPrice}) {
+    const res = await fetch(`/products/${id}`, {
+        method: "PUT",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({name, salePrice, costPrice}),
+    });
+    const json = await res.json();
+    if (!res.ok || json?.success === false) {
+        throw new Error(json?.message ?? "수정 실패");
+    }
+    return json.data;
 }
 
-export async function deleteProductApi() {
+export async function deleteProductApi(id) {
 
 }
