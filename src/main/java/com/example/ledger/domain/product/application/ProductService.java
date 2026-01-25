@@ -4,6 +4,7 @@ import com.example.ledger.domain.product.application.sku.SkuGenerator;
 import com.example.ledger.domain.product.dto.command.CreateCommand;
 import com.example.ledger.domain.product.dto.command.FindAllCommand;
 import com.example.ledger.domain.product.dto.command.FindOneCommand;
+import com.example.ledger.domain.product.dto.command.UpdateCommand;
 import com.example.ledger.domain.product.dto.response.FindAllResponse;
 import com.example.ledger.domain.product.dto.result.CreateResult;
 import com.example.ledger.domain.product.dto.result.FindOneResult;
@@ -81,6 +82,7 @@ public class ProductService {
             throw new ProductException(ProductErrorCode.PRODUCT_NAME_DUPLICATE);
         }
         // 수정
+        Product product = Product.update();
         return new UpdateResult(
 
         );

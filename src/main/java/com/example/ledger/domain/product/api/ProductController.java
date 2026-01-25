@@ -5,6 +5,7 @@ import com.example.ledger.domain.product.application.ProductService;
 import com.example.ledger.domain.product.dto.command.CreateCommand;
 import com.example.ledger.domain.product.dto.command.FindAllCommand;
 import com.example.ledger.domain.product.dto.command.FindOneCommand;
+import com.example.ledger.domain.product.dto.command.UpdateCommand;
 import com.example.ledger.domain.product.dto.request.CreateRequest;
 import com.example.ledger.domain.product.dto.response.CreateResponse;
 import com.example.ledger.domain.product.dto.response.FindAllResponse;
@@ -84,7 +85,7 @@ public class ProductController {
             @PathVariable Long id,
             @RequestBody UpdateRequest request
     ){
-        UpdtateCommand command = new UpdateCommand(
+        UpdateCommand command = new UpdateCommand(
 
         );
         UpdateResult result = productService.update(command);

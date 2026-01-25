@@ -1,5 +1,6 @@
 package com.example.ledger.domain.product.entity;
 
+import com.example.ledger.domain.product.dto.command.UpdateCommand;
 import jakarta.persistence.*;
 
 import java.math.BigDecimal;
@@ -100,4 +101,17 @@ public class Product {
         product.createdAt = LocalDateTime.now();
         return product;
     }
+
+    public static Product update(
+            String name,
+            BigDecimal salePrice,
+            BigDecimal costPrice
+    ) {
+        Product product = new Product();
+        product.name = name;
+        product.salePrice = salePrice;
+        product.costPrice = costPrice;
+        return product;
+    }
+
 }

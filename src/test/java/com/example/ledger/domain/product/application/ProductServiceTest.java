@@ -4,6 +4,7 @@ import com.example.ledger.domain.product.application.sku.SkuGenerator;
 import com.example.ledger.domain.product.dto.command.CreateCommand;
 import com.example.ledger.domain.product.dto.command.FindAllCommand;
 import com.example.ledger.domain.product.dto.command.FindOneCommand;
+import com.example.ledger.domain.product.dto.command.UpdateCommand;
 import com.example.ledger.domain.product.dto.response.FindAllResponse;
 import com.example.ledger.domain.product.dto.result.FindOneResult;
 import com.example.ledger.domain.product.entity.Product;
@@ -164,6 +165,17 @@ class ProductServiceTest {
     @Test
     @DisplayName("게시글 수정 성공")
     void product_put_success(){
+        UpdateCommand command = new UpdateCommand(
+            "name",
+                BigDecimal.valueOf(5000),
+                BigDecimal.valueOf(4000)
+        );
+        given(productRepository.existsByName("name")).willReturn(false);
+        given(productRepository.save(any(Product.class)))
+                .willAnswer(invocation -> invocation.getArgument(0));
+        productService.update(command);
+        verify(productRepository).existsByName("name");
+        verify(productRepository).save(any(Product.class));
 
     }
 }
