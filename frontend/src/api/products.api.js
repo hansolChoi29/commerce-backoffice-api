@@ -1,4 +1,4 @@
-export async function fetchProductsApi({ page, size, sort }) {
+export async function fetchProductsApi({page, size, sort}) {
     const res = await fetch(`/products?page=${page}&size=${size}&sort=${encodeURIComponent(sort)}`);
     const json = await res.json();
     if (!res.ok || json?.success === false) {
@@ -7,14 +7,23 @@ export async function fetchProductsApi({ page, size, sort }) {
     return json.data;
 }
 
-export async function createProductApi(){
+export async function createProductApi({name, salePrice, costPrice}) {
+    const res = await fetch("/products", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({name, salePrice, costPrice}),
+    });
+    const json = await res.json();
+    if (!res.ok || json?.success === false) {
+        throw new Error(json?.message ?? "등록 실패")
+    }
+    return json.data;
+}
+
+export async function updateProductApi() {
 
 }
 
-export async function updateProductApi(){
-
-}
-
-export async function deleteProductApi(){
+export async function deleteProductApi() {
 
 }

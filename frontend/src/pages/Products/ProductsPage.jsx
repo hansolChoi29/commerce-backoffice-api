@@ -1,7 +1,7 @@
 import {useEffect, useState} from "react";
 import ProductCreateForm from "./_components/ProductCreateForm.jsx";
 import {useNavigate} from "react-router-dom";
-import {fetchProductsApi} from "../../api/products.api.js";
+import {createProductApi, fetchProductsApi} from "../../api/products.api.js";
 
 export default function ProductsPage() {
     const navigate = useNavigate();
@@ -19,7 +19,7 @@ export default function ProductsPage() {
             const data = await fetchProductsApi({
                 page,
                 size: pageInfo.size,
-                sort: "createdAt, desc"
+                sort: "createdAt,desc"
             });
 
             setItems(data.item);
@@ -34,22 +34,15 @@ export default function ProductsPage() {
     const createProduct = async ({name, salePrice, costPrice}) => {
         setPending(true);
         setError("");
+        try {
+            await createProductApi({name, salePrice, costPrice});
+            await fetchProducts(0);
 
-        const res = await fetch("/products", {
-            method: "POST",
-            headers: {"Content-Type": "application/json"},
-            body: JSON.stringify({name, salePrice, costPrice}),
-        });
-        const json = await res.json();
-
-        if (!res.ok || json?.success === false) {
-            setError(json?.message ?? "등록 실패");
+        } catch (e) {
+            setError(e.message ?? "등록 실패");
+        } finally {
             setPending(false);
-            return;
         }
-
-        await fetchProducts(0);
-        setPending(false);
     };
 
     useEffect(() => {
