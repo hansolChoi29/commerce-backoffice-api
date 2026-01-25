@@ -1,6 +1,7 @@
 import {useEffect, useState} from "react";
 import ProductCreateForm from "./_components/ProductCreateForm.jsx";
 import {useNavigate} from "react-router-dom";
+import {fetchProductsApi} from "../../api/products.api.js";
 
 export default function ProductsPage() {
     const navigate = useNavigate();
@@ -14,15 +15,20 @@ export default function ProductsPage() {
     const fetchProducts = async (page = 0) => {
         setPending(true);
         setError("");
+        try {
+            const data = await fetchProductsApi({
+                page,
+                size: pageInfo.size,
+                sort: "createdAt, desc"
+            });
 
-        const res = await fetch(`/products?page=${page}&size=${pageInfo.size}&sort=createdAt,desc`);
-        const json = await res.json();
-        const data = json.data;
-
-        setItems(data.item);
-        setPageInfo({page: data.page, size: data.size, totalPages: data.totalPages, hasNext: data.hasNext});
-
-        setPending(false);
+            setItems(data.item);
+            setPageInfo({page: data.page, size: data.size, totalPages: data.totalPages, hasNext: data.hasNext});
+        } catch (e) {
+            setError(e.message ?? "목록 조회 실패");
+        } finally {
+            setPending(false);
+        }
     };
 
     const createProduct = async ({name, salePrice, costPrice}) => {
