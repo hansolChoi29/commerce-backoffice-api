@@ -8,11 +8,13 @@ import com.example.ledger.domain.product.dto.command.UpdateCommand;
 import com.example.ledger.domain.product.dto.response.FindAllResponse;
 import com.example.ledger.domain.product.dto.result.CreateResult;
 import com.example.ledger.domain.product.dto.result.FindOneResult;
+import com.example.ledger.domain.product.dto.result.UpdateResult;
 import com.example.ledger.domain.product.entity.Product;
 import com.example.ledger.domain.product.infra.ProductRepository;
 import com.example.ledger.global.exception.product.ProductErrorCode;
 import com.example.ledger.global.exception.product.ProductException;
 import com.example.ledger.global.response.PageResponse;
+import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
@@ -77,14 +79,21 @@ public class ProductService {
     }
 
     // 수정은 멱등하게 설계할 것
-    public UpdateResult update(UpdateCommand command) {
-        if (productRepository.existsByName(command.getName())) {
-            throw new ProductException(ProductErrorCode.PRODUCT_NAME_DUPLICATE);
-        }
-        // 수정
-        Product product = Product.update();
-        return new UpdateResult(
+    @Transactional
+    public UpdateResult update(Long id, UpdateCommand command) {
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new ProductException(ProductErrorCode.PRODUCT_NOT_FOUND));
 
+        product.update(
+                command.getName(),
+                command.getSalePrice(),
+                command.getCostPrice()
+        );
+
+        return new UpdateResult(
+                product.getName(),
+                product.getSalePrice(),
+                product.getCostPrice()
         );
     }
 }

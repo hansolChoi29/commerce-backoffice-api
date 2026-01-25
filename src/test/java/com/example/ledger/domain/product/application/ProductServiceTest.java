@@ -7,6 +7,7 @@ import com.example.ledger.domain.product.dto.command.FindOneCommand;
 import com.example.ledger.domain.product.dto.command.UpdateCommand;
 import com.example.ledger.domain.product.dto.response.FindAllResponse;
 import com.example.ledger.domain.product.dto.result.FindOneResult;
+import com.example.ledger.domain.product.dto.result.UpdateResult;
 import com.example.ledger.domain.product.entity.Product;
 import com.example.ledger.domain.product.infra.ProductRepository;
 import com.example.ledger.global.exception.product.ProductException;
@@ -164,18 +165,31 @@ class ProductServiceTest {
 
     @Test
     @DisplayName("게시글 수정 성공")
-    void product_put_success(){
+    void product_put_success() {
+        Long id = 1L;
+        Product product = Product.create(
+                "SKU-TEST",
+                "oldName",
+                BigDecimal.valueOf(1000),
+                BigDecimal.valueOf(900)
+        );
+        given(productRepository.findById(id))
+                .willReturn(Optional.of(product));
+
         UpdateCommand command = new UpdateCommand(
-            "name",
+                "name",
                 BigDecimal.valueOf(5000),
                 BigDecimal.valueOf(4000)
         );
-        given(productRepository.existsByName("name")).willReturn(false);
-        given(productRepository.save(any(Product.class)))
-                .willAnswer(invocation -> invocation.getArgument(0));
-        productService.update(command);
-        verify(productRepository).existsByName("name");
-        verify(productRepository).save(any(Product.class));
+        UpdateResult result = productService.update(id, command);
+        verify(productRepository).findById(id);
 
+        assertThat(result.getName()).isEqualTo("name");
+        assertThat(result.getSalePrice()).isEqualTo(BigDecimal.valueOf(5000));
+        assertThat(result.getCostPrice()).isEqualTo(BigDecimal.valueOf(4000));
+
+        // entity 변경 확인
+        assertThat(product.getName()).isEqualTo("name");
+        assertThat(product.getSalePrice()).isEqualTo(BigDecimal.valueOf(5000));
     }
 }

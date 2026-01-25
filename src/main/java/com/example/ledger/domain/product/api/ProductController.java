@@ -7,9 +7,12 @@ import com.example.ledger.domain.product.dto.command.FindAllCommand;
 import com.example.ledger.domain.product.dto.command.FindOneCommand;
 import com.example.ledger.domain.product.dto.command.UpdateCommand;
 import com.example.ledger.domain.product.dto.request.CreateRequest;
+import com.example.ledger.domain.product.dto.request.UpdateRequest;
+import com.example.ledger.domain.product.dto.result.UpdateResult;
 import com.example.ledger.domain.product.dto.response.CreateResponse;
 import com.example.ledger.domain.product.dto.response.FindAllResponse;
 import com.example.ledger.domain.product.dto.response.FindOneResponse;
+import com.example.ledger.domain.product.dto.response.UpdateResponse;
 import com.example.ledger.domain.product.dto.result.CreateResult;
 import com.example.ledger.domain.product.dto.result.FindOneResult;
 import com.example.ledger.global.response.ApiResponse;
@@ -84,14 +87,18 @@ public class ProductController {
     public ResponseEntity<ApiResponse<UpdateResponse>> update(
             @PathVariable Long id,
             @RequestBody UpdateRequest request
-    ){
+    ) {
         UpdateCommand command = new UpdateCommand(
-
+                request.getName(),
+                request.getSalePrice(),
+                request.getCostPrice()
         );
-        UpdateResult result = productService.update(command);
+        UpdateResult result = productService.update(id, command);
         UpdateResponse response = new UpdateResponse(
-
+                result.getName(),
+                result.getSalePrice(),
+                result.getCostPrice()
         );
-        return ResponseEntity.ok(ApiResponse.ok("성공적으로 수정되었습니다.",response ));
+        return ResponseEntity.ok(ApiResponse.ok("성공적으로 수정되었습니다.", response));
     }
 }

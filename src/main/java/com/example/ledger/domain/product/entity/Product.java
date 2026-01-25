@@ -102,16 +102,13 @@ public class Product {
         return product;
     }
 
-    public static Product update(
+    public void update(
             String name,
             BigDecimal salePrice,
             BigDecimal costPrice
     ) {
-        Product product = new Product();
-        product.name = name;
-        product.salePrice = salePrice;
-        product.costPrice = costPrice;
-        return product;
+        this.name = name;
+        this.salePrice = salePrice;
+        this.costPrice = costPrice;
     }
-
 }
