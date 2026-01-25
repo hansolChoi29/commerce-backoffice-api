@@ -1,14 +1,12 @@
 package com.example.ledger.domain.product.application;
 
 import com.example.ledger.domain.product.application.sku.SkuGenerator;
-import com.example.ledger.domain.product.dto.command.CreateCommand;
-import com.example.ledger.domain.product.dto.command.FindAllCommand;
-import com.example.ledger.domain.product.dto.command.FindOneCommand;
-import com.example.ledger.domain.product.dto.command.UpdateCommand;
+import com.example.ledger.domain.product.dto.command.*;
 import com.example.ledger.domain.product.dto.response.FindAllResponse;
 import com.example.ledger.domain.product.dto.result.FindOneResult;
 import com.example.ledger.domain.product.dto.result.UpdateResult;
 import com.example.ledger.domain.product.entity.Product;
+import com.example.ledger.domain.product.entity.ProductStatus;
 import com.example.ledger.domain.product.infra.ProductRepository;
 import com.example.ledger.global.exception.product.ProductException;
 import com.example.ledger.global.response.PageResponse;
@@ -139,7 +137,7 @@ class ProductServiceTest {
     }
 
     @Test
-    @DisplayName("게시글 전체조회 성공")
+    @DisplayName("상품  전체조회 성공")
     void findAll_success() {
         Product p1 = Product.create("SKU-1", "name1", BigDecimal.valueOf(1200), BigDecimal.valueOf(12000));
         Product p2 = Product.create("SKU-2", "name2", BigDecimal.valueOf(4200), BigDecimal.valueOf(92000));
@@ -164,7 +162,7 @@ class ProductServiceTest {
     }
 
     @Test
-    @DisplayName("게시글 수정 성공")
+    @DisplayName("상품 수정 성공")
     void product_put_success() {
         Long id = 1L;
         Product product = Product.create(
@@ -191,5 +189,20 @@ class ProductServiceTest {
         // entity 변경 확인
         assertThat(product.getName()).isEqualTo("name");
         assertThat(product.getSalePrice()).isEqualTo(BigDecimal.valueOf(5000));
+    }
+
+    @Test
+    @DisplayName("상품삭제")
+    void delete_success() {
+        Long id = 1L;
+        Product product = Product.create("SKU-123", "name",
+                BigDecimal.valueOf(1200), BigDecimal.valueOf(1500));
+
+        given(productRepository.findById(id)).willReturn(Optional.of(product));
+
+        productService.delete(new DeleteCommand(id));
+
+        assertThat(product.getStatus()).isEqualTo(ProductStatus.INACTIVE);
+        verify(productRepository).findById(id);
     }
 }

@@ -23,7 +23,7 @@ public class Product {
     private String name; // 상품명
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "status", length = 20)
+    @Column(name = "status", length = 20, nullable = false)
     private ProductStatus status; // 판매상태
 
     @Column(name = "sale_price", nullable = false)
@@ -68,10 +68,6 @@ public class Product {
         return name;
     }
 
-    public ProductStatus getStatus() {
-        return status;
-    }
-
     public BigDecimal getSalePrice() {
         return salePrice;
     }
@@ -110,5 +106,14 @@ public class Product {
         this.name = name;
         this.salePrice = salePrice;
         this.costPrice = costPrice;
+    }
+
+
+    public void delete() {
+        this.status = ProductStatus.INACTIVE;
+    }
+
+    public ProductStatus getStatus() {
+        return status;
     }
 }

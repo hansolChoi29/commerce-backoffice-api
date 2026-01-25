@@ -2,17 +2,12 @@ package com.example.ledger.domain.product.api;
 
 
 import com.example.ledger.domain.product.application.ProductService;
-import com.example.ledger.domain.product.dto.command.CreateCommand;
-import com.example.ledger.domain.product.dto.command.FindAllCommand;
-import com.example.ledger.domain.product.dto.command.FindOneCommand;
-import com.example.ledger.domain.product.dto.command.UpdateCommand;
+import com.example.ledger.domain.product.dto.command.*;
 import com.example.ledger.domain.product.dto.request.CreateRequest;
 import com.example.ledger.domain.product.dto.request.UpdateRequest;
+import com.example.ledger.domain.product.dto.response.*;
+import com.example.ledger.domain.product.dto.result.DeleteResult;
 import com.example.ledger.domain.product.dto.result.UpdateResult;
-import com.example.ledger.domain.product.dto.response.CreateResponse;
-import com.example.ledger.domain.product.dto.response.FindAllResponse;
-import com.example.ledger.domain.product.dto.response.FindOneResponse;
-import com.example.ledger.domain.product.dto.response.UpdateResponse;
 import com.example.ledger.domain.product.dto.result.CreateResult;
 import com.example.ledger.domain.product.dto.result.FindOneResult;
 import com.example.ledger.global.response.ApiResponse;
@@ -100,5 +95,14 @@ public class ProductController {
                 result.getCostPrice()
         );
         return ResponseEntity.ok(ApiResponse.ok("성공적으로 수정되었습니다.", response));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<ApiResponse<DeleteResponse>> delete(
+            @PathVariable Long id
+    ) {
+        DeleteCommand command = new DeleteCommand(id);
+         productService.delete(command);
+        return ResponseEntity.noContent().build();
     }
 }

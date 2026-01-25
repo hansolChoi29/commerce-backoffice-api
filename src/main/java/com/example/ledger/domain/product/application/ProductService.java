@@ -1,15 +1,13 @@
 package com.example.ledger.domain.product.application;
 
 import com.example.ledger.domain.product.application.sku.SkuGenerator;
-import com.example.ledger.domain.product.dto.command.CreateCommand;
-import com.example.ledger.domain.product.dto.command.FindAllCommand;
-import com.example.ledger.domain.product.dto.command.FindOneCommand;
-import com.example.ledger.domain.product.dto.command.UpdateCommand;
+import com.example.ledger.domain.product.dto.command.*;
 import com.example.ledger.domain.product.dto.response.FindAllResponse;
 import com.example.ledger.domain.product.dto.result.CreateResult;
 import com.example.ledger.domain.product.dto.result.FindOneResult;
 import com.example.ledger.domain.product.dto.result.UpdateResult;
 import com.example.ledger.domain.product.entity.Product;
+import com.example.ledger.domain.product.entity.ProductStatus;
 import com.example.ledger.domain.product.infra.ProductRepository;
 import com.example.ledger.global.exception.product.ProductErrorCode;
 import com.example.ledger.global.exception.product.ProductException;
@@ -72,7 +70,7 @@ public class ProductService {
 
     public PageResponse<FindAllResponse> findAll(FindAllCommand command) {
         Page<FindAllResponse> page = productRepository
-                .findAll(command.getPageable())
+                .findAllByStatus(ProductStatus.ACTIVE, command.getPageable())
                 .map(FindAllResponse::from);
 
         return PageResponse.from(page);
@@ -95,5 +93,12 @@ public class ProductService {
                 product.getSalePrice(),
                 product.getCostPrice()
         );
+    }
+    @Transactional
+    public void delete(DeleteCommand command) {
+        Product product = productRepository.findById(
+                        command.getId())
+                .orElseThrow(() -> new ProductException(ProductErrorCode.PRODUCT_NOT_FOUND));
+        product.delete();
     }
 }
