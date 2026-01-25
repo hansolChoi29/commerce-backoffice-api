@@ -34,5 +34,11 @@ export async function updateProductApi(id, {name, salePrice, costPrice}) {
 }
 
 export async function deleteProductApi(id) {
-
+    const res = await fetch(`/products/${id}`, {method: "DELETE"});
+    if (res.status === 204) return null;
+    const json = await res.json().catch(() => null);
+    if (!res.ok || json?.success === false) {
+        throw new Error(json?.message ?? "삭제 실패");
+    }
+    return json?.data ?? null;
 }
