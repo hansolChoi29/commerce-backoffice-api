@@ -160,4 +160,10 @@ class ProductServiceTest {
         assertThat(result.getTotalElements()).isEqualTo(22);
         assertThat(result.isHasNext()).isTrue();
     }
+
+    @Test
+    @DisplayName("게시글 수정 성공")
+    void product_put_success(){
+
+    }
 }

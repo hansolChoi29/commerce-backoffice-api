@@ -74,4 +74,15 @@ public class ProductService {
 
         return PageResponse.from(page);
     }
+
+    // 수정은 멱등하게 설계할 것
+    public UpdateResult update(UpdateCommand command) {
+        if (productRepository.existsByName(command.getName())) {
+            throw new ProductException(ProductErrorCode.PRODUCT_NAME_DUPLICATE);
+        }
+        // 수정
+        return new UpdateResult(
+
+        );
+    }
 }

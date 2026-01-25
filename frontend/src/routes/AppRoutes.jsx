@@ -6,6 +6,7 @@ import AdminLayout from "../pages/layouts/AdminLayout.jsx";
 import AuthLayout from "../pages/layouts/AuthLayout.jsx";
 import LoginPage from "../pages/Auth/LoginPage.jsx";
 import ProtectedRoute from "./ProtectedRoute.jsx";
+import ProductDetailPage from "../pages/Products/[id]/ProductDetailPage.jsx";
 
 export default function AppRoutes() {
     return (
@@ -17,11 +18,11 @@ export default function AppRoutes() {
                 <Route path="/login" element={<LoginPage/>}/>
             </Route>
 
-            {/* 보호 구간 */}
             <Route element={<ProtectedRoute/>}>
                 <Route path="/admin" element={<AdminLayout/>}>
                     <Route index element={<Navigate to="products" replace/>}/>
                     <Route path="products" element={<ProductsPage/>}/>
+                    <Route path="products/:id" element={<ProductDetailPage />} />
                     <Route path="purchase-orders" element={<PurchaseOrdersPage/>}/>
                     <Route path="sales" element={<SalesPage/>}/>
                 </Route>

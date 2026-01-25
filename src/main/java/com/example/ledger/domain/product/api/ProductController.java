@@ -77,4 +77,20 @@ public class ProductController {
         PageResponse<FindAllResponse> response = productService.findAll(command);
         return ResponseEntity.ok(ApiResponse.ok("목록을 불러왔습니다.", response));
     }
+
+    // 수정은 멱등하게 설계할 것
+    @PutMapping("/{id}")
+    public ResponseEntity<ApiResponse<UpdateResponse>> update(
+            @PathVariable Long id,
+            @RequestBody UpdateRequest request
+    ){
+        UpdtateCommand command = new UpdateCommand(
+
+        );
+        UpdateResult result = productService.update(command);
+        UpdateResponse response = new UpdateResponse(
+
+        );
+        return ResponseEntity.ok(ApiResponse.ok("성공적으로 수정되었습니다.",response ));
+    }
 }

@@ -1,6 +1,6 @@
 package com.example.ledger.domain.partner.entity;
 
 public enum PartnerStatus {
-    ACTIVE, // 판매 가능한 상품 
-    INACTIVE // 판매 불가능한 상품
+    ACTIVE, // 이 거래처는 거래 가능
+    INACTIVE // 이 거래처는 거래 불가
 }
