@@ -26,7 +26,43 @@ public class Partner {
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false, length = 20)
     private PartnerStatus status;
-
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
+
+    protected Partner() {
+    }
+
+    public Partner(
+            Long id,
+            PartnerType type,
+            String name,
+            PartnerStatus status,
+            LocalDateTime createdAt
+    ) {
+        this.id = id;
+        this.type = type;
+        this.name = name;
+        this.status = status;
+        this.createdAt = createdAt;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public PartnerStatus getStatus() {
+        return status;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public PartnerType getType() {
+        return type;
+    }
+
+    public Long getId() {
+        return id;
+    }
 }
