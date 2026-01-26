@@ -3,6 +3,7 @@ package com.example.ledger.domain.product.application;
 import com.example.ledger.domain.product.application.sku.SkuGenerator;
 import com.example.ledger.domain.product.dto.command.*;
 import com.example.ledger.domain.product.dto.response.FindAllResponse;
+import com.example.ledger.domain.product.dto.response.FindOneResponse;
 import com.example.ledger.domain.product.dto.result.FindOneResult;
 import com.example.ledger.domain.product.dto.result.UpdateResult;
 import com.example.ledger.domain.product.entity.Product;
@@ -32,6 +33,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -59,16 +61,14 @@ class ProductServiceTest {
                 BigDecimal.valueOf(12000),
                 BigDecimal.valueOf(13000)
         );
-        given(productRepository.existsByName("name")).willReturn(false);
+        given(productRepository.existsByNameAndDeletedFalse("name")).willReturn(false);
         given(skuGenerator.generate()).willReturn("SKU-012345678910");
-        // willAnswer : 내가 직접 응답을 만들겠다
-        // invocation : 이번 호출(호출 정보 묶음)
         given(productRepository.save(any(Product.class)))
                 .willAnswer(invocation -> invocation.getArgument(0));
         // when
         productService.create(command);
         //then
-        verify(productRepository).existsByName("name");
+        verify(productRepository).existsByNameAndDeletedFalse("name");
         verify(skuGenerator).generate();
         verify(productRepository).save(any(Product.class));
     }
@@ -88,7 +88,8 @@ class ProductServiceTest {
                 BigDecimal.valueOf(12000),
                 BigDecimal.valueOf(13000)
         );
-        given(productRepository.existsByName("name")).willReturn(true);
+        given(productRepository.existsByNameAndDeletedFalse("name")).willReturn(false); // success
+        given(productRepository.existsByNameAndDeletedFalse("name")).willReturn(true);  // duplicate
 
         // [핵심]이 예외는 터져야 한다
         assertThrows(
@@ -96,7 +97,8 @@ class ProductServiceTest {
                 () -> productService.create(command)
         );
 
-        verify(productRepository).existsByName("name");
+        verify(productRepository).existsByNameAndDeletedFalse("name");
+        verify(productRepository, never()).save(any(Product.class));
         verify(skuGenerator, never()).generate(); // 호출되면 안 된다
         verify(productRepository, never()).save(any(Product.class));
     }
@@ -115,25 +117,25 @@ class ProductServiceTest {
                 LocalDateTime.now()
         );
 
-        given(productRepository.findById(id)).willReturn(Optional.of(product));
+        given(productRepository.findByIdAndDeletedFalse(id)).willReturn(Optional.of(product));
 
         FindOneResult result = productService.findOne(new FindOneCommand(id));
 
         assertThat(result.getId()).isEqualTo(id);
-        verify(productRepository).findById(id);
+        verify(productRepository).findByIdAndDeletedFalse(id);
     }
 
     @Test
     @DisplayName("존재하지 않는 Id")
     void findOne_Id_isNull() {
         Long id = 1L;
-        given(productRepository.findById(id)).willReturn(Optional.empty());
+        given(productRepository.findByIdAndDeletedFalse(id)).willReturn(Optional.empty());
 
         assertThatThrownBy(() -> productService.findOne(new FindOneCommand(id)))
                 .isInstanceOf(ProductException.class)
                 .hasMessageContaining("존재하지 않는 상품");
 
-        verify(productRepository).findById(id);
+        verify(productRepository).findByIdAndDeletedFalse(id);
     }
 
     @Test
@@ -148,7 +150,7 @@ class ProductServiceTest {
                 22
         );
 
-        given(productRepository.findAll(any(Pageable.class)))
+        given(productRepository.findAllByDeletedFalseAndStatus(eq(ACTIVE), any(Pageable.class)))
                 .willReturn(productPage);
 
         FindAllCommand command = new FindAllCommand(PageRequest.of(0, 20));
@@ -191,18 +193,79 @@ class ProductServiceTest {
         assertThat(product.getSalePrice()).isEqualTo(BigDecimal.valueOf(5000));
     }
 
+    /*
+     * 1) 삭제 후 목록에서 제외된다
+     * given 상품 1생성
+     * when delete
+     * then findAllByDeletedFalseAndStatus 결과
+     *
+     * 2) 삭제 후 단건조회에서 제외된다
+     * given 상품 1개 생성
+     * when delete
+     * then findByIdAndDeletedFalse로 조회 시 empty
+     *
+     * 3) 이름 중복 체크는 삭제된 상품은 제외한다
+     * given name = a 생성 후 delete
+     * when name = a 로 다시 생성 요청
+     * then 성공
+     *
+     * 4) sku 유니크가 살아이쓴 것만 적용된다
+     * given sku = aaa 로 상품 저장 후 delete = true로 변경
+     * when sku = aaa + deleted = false로 새 상품 저장
+     * then 성공
+     * */
     @Test
-    @DisplayName("상품삭제")
-    void delete_success() {
-        Long id = 1L;
-        Product product = Product.create("SKU-123", "name",
-                BigDecimal.valueOf(1200), BigDecimal.valueOf(1500));
+    @DisplayName("삭제 후 목록에서 제외")
+    void findAll_excludes_deleted_product() {
+        FindAllCommand command = new FindAllCommand(PageRequest.of(0, 20));
+        given(productRepository.findAllByDeletedFalseAndStatus(eq(ACTIVE), any(Pageable.class)))
+                .willReturn(Page.empty());
 
-        given(productRepository.findById(id)).willReturn(Optional.of(product));
+        PageResponse<FindAllResponse> result = productService.findAll(command);
 
-        productService.delete(new DeleteCommand(id));
-
-        assertThat(product.getStatus()).isEqualTo(ProductStatus.INACTIVE);
-        verify(productRepository).findById(id);
+        assertThat(result.getItem()).isEmpty();
+        verify(productRepository).findAllByDeletedFalseAndStatus(eq(ACTIVE), any(Pageable.class));
     }
+
+    @Test
+    @DisplayName("삭제 후 단건조회에서 제외")
+    void findOne_excludes_deleted_product() {
+        FindOneCommand command = new FindOneCommand(1L);
+        given(productRepository.findByIdAndDeletedFalse(eq(1L))).willReturn(Optional.empty());
+
+        assertThatThrownBy(() -> productService.findOne(new FindOneCommand(1L)))
+                .isInstanceOf(ProductException.class);
+        verify(productRepository).findByIdAndDeletedFalse(eq(1L));
+    }
+
+    @Test
+    @DisplayName("이름 중복 체크는 삭제된 상품은 제외")
+    void name_duplicate_when_isDeleted() {
+        CreateCommand command = new CreateCommand("name", BigDecimal.valueOf(12), BigDecimal.valueOf(12));
+
+        given(productRepository.existsByNameAndDeletedFalse("name")).willReturn(false);
+        given(skuGenerator.generate()).willReturn("SKU-NEW");
+        given(productRepository.save(any(Product.class))).willAnswer(invocation -> invocation.getArgument(0));
+
+        productService.create(command);
+
+        verify(productRepository).existsByNameAndDeletedFalse("name");
+        verify(skuGenerator).generate();
+        verify(productRepository).save(any(Product.class));
+    }
+
+    @Test
+    @DisplayName("sku 유니크가 살아이쓴 것만 적용")
+    void sku_unique_delete_true(){
+        Product old = Product.create("SKU-AAA", "old", BigDecimal.TEN, BigDecimal.ONE);
+        productRepository.saveAndFlush(old);
+
+        old.delete();
+        productRepository.flush();
+
+        Product newer = Product.create("SKU-AAA", "new", BigDecimal.TEN, BigDecimal.ONE);
+
+        productRepository.saveAndFlush(newer);
+    }
+
 }

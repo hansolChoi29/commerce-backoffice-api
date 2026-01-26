@@ -1,7 +1,6 @@
 package com.example.ledger.domain.product.infra;
 
 
-import com.example.ledger.domain.product.dto.response.FindAllResponse;
 import com.example.ledger.domain.product.entity.Product;
 import com.example.ledger.domain.product.entity.ProductStatus;
 import org.springframework.data.domain.Page;
@@ -13,9 +12,8 @@ import java.util.Optional;
 public interface ProductRepository extends JpaRepository<Product, Long> {
     boolean existsByName(String name);
 
-    Optional<Product> findById(Long id);
+    Page<Product> findAllByDeletedFalseAndStatus(ProductStatus status, Pageable pageable);
+    Optional<Product> findByIdAndDeletedFalse(Long id);
 
-    Page<Product> findAll(Pageable Pagealbe);
-
-    Page<Product> findAllByStatus(ProductStatus status, Pageable pageable);
+    boolean existsByNameAndDeletedFalse(String name);
 }

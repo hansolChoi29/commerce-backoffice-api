@@ -30,7 +30,7 @@ public class ProductService {
     }
 
     public CreateResult create(CreateCommand command) {
-        if (productRepository.existsByName(command.getName())) {
+        if (productRepository.existsByNameAndDeletedFalse(command.getName())) {
             throw new ProductException(ProductErrorCode.PRODUCT_NAME_DUPLICATE);
         }
 
@@ -54,7 +54,7 @@ public class ProductService {
     }
 
     public FindOneResult findOne(FindOneCommand command) {
-        Product product = productRepository.findById(command.getId())
+        Product product = productRepository.findByIdAndDeletedFalse(command.getId())
                 .orElseThrow(() -> new ProductException(ProductErrorCode.PRODUCT_NOT_FOUND));
 
         return new FindOneResult(
@@ -70,7 +70,7 @@ public class ProductService {
 
     public PageResponse<FindAllResponse> findAll(FindAllCommand command) {
         Page<FindAllResponse> page = productRepository
-                .findAllByStatus(ProductStatus.ACTIVE, command.getPageable())
+                .findAllByDeletedFalseAndStatus(ProductStatus.ACTIVE, command.getPageable())
                 .map(FindAllResponse::from);
 
         return PageResponse.from(page);
@@ -96,7 +96,7 @@ public class ProductService {
     }
     @Transactional
     public void delete(DeleteCommand command) {
-        Product product = productRepository.findById(
+        Product product = productRepository.findByIdAndDeletedFalse(
                         command.getId())
                 .orElseThrow(() -> new ProductException(ProductErrorCode.PRODUCT_NOT_FOUND));
         product.delete();

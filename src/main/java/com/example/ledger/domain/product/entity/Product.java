@@ -1,6 +1,5 @@
 package com.example.ledger.domain.product.entity;
 
-import com.example.ledger.domain.product.dto.command.UpdateCommand;
 import jakarta.persistence.*;
 
 import java.math.BigDecimal;
@@ -9,8 +8,6 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "product")
 public class Product {
-    // 상품 : 발주/입고/매출/재고가 전부 이 상품을 기준으로 움직임
-    // 그래서 해당 레포엔 상품 등록, 목록/검색, 상태변경 있어야 함
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "product_id")
@@ -35,6 +32,9 @@ public class Product {
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
+    @Column(name = "deleted", nullable = false)
+    private boolean deleted = false;
+
     protected Product() {
     }
 
@@ -56,32 +56,6 @@ public class Product {
         this.createdAt = createdAt;
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public String getSku() {
-        return sku;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public BigDecimal getSalePrice() {
-        return salePrice;
-    }
-
-    public BigDecimal getCostPrice() {
-        return costPrice;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    // TODO : PrePersist 학습하여 적용하기
-
     public static Product create(
             String sku,
             String name,
@@ -98,6 +72,32 @@ public class Product {
         return product;
     }
 
+    public Long getId() {
+        return id;
+    }
+
+    public String getSku() {
+        return sku;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public BigDecimal getSalePrice() {
+        return salePrice;
+    }
+
+    // TODO : PrePersist 학습하여 적용하기
+
+    public BigDecimal getCostPrice() {
+        return costPrice;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
     public void update(
             String name,
             BigDecimal salePrice,
@@ -108,9 +108,24 @@ public class Product {
         this.costPrice = costPrice;
     }
 
+/*
+    [문제]
+     소프트 삭제(행을 지우지 않음) 구조에서 sku에 unique가 걸려 있으면,
+     삭제된 상품도 DB에 남아 있어서 동일 sku 재등록이 "중복"으로 실패할 수 있음.
+
+     [해결책] deleted 컬럼 추가하여 유니크(sku, deleted) 묶기
+
+     [설계] deleted = false 살아있는 제품
+     (AAA-111, false) 1개만 존재 가능 - 중복 생성 방지
+     (AAA-111, true)가 있어도 새로 (AAA-111, false)를 만들 수 있음 - 재등록 가능
+*/
 
     public void delete() {
-        this.status = ProductStatus.INACTIVE;
+        this.deleted = true;
+    }
+
+    public boolean isDeleted() {
+        return deleted;
     }
 
     public ProductStatus getStatus() {

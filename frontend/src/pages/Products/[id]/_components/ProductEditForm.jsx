@@ -4,7 +4,6 @@ export default function ProductEditForm({item, pending, onSave}) {
     const [name, setName] = useState("");
     const [salePrice, setSalePrice] = useState("");
     const [costPrice, setCostPrice] = useState("");
-    const [status, setStatus] = useState("ACTIVE");
 
     useEffect(() => {
         if (!item) return;
@@ -12,7 +11,6 @@ export default function ProductEditForm({item, pending, onSave}) {
         setName(item.name ?? "");
         setSalePrice(String(item.salePrice ?? ""));
         setCostPrice(String(item.costPrice ?? ""));
-        setStatus(item.status ?? "ACTIVE");
     }, [item]);
 
     const handleSubmit = async (e) => {
@@ -44,14 +42,6 @@ export default function ProductEditForm({item, pending, onSave}) {
                 <label>
                     원가
                     <input value={costPrice} onChange={(e) => setCostPrice(e.target.value)}/>
-                </label>
-
-                <label>
-                    상태
-                    <select value={status} onChange={(e) => setStatus(e.target.value)}>
-                        <option value="ACTIVE">ACTIVE</option>
-                        <option value="INACTIVE">INACTIVE</option>
-                    </select>
                 </label>
 
                 <button type="submit" disabled={pending}>
