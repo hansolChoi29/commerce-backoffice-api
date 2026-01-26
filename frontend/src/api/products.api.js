@@ -42,3 +42,13 @@ export async function deleteProductApi(id) {
     }
     return json?.data ?? null;
 }
+
+export async function fetchProductApi(id) {
+    const res = await fetch(`/products/${id}`);
+    const json = await res.json();
+
+    if (!res.ok || json?.success === false) {
+        throw new Error(json?.message ?? "상품 조회 실패");
+    }
+    return json.data;
+}
