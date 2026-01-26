@@ -1,7 +1,7 @@
 import ProductsPage from "../pages/Products/ProductsPage";
 import PurchaseOrdersPage from "../pages/PurchaseOrders/PurchaseOrdersPage";
 import SalesPage from "../pages/Sales/SalesPage";
-import {Navigate, Route, Router, Routes} from "react-router-dom";
+import {Navigate, Route, Routes} from "react-router-dom";
 import AdminLayout from "../pages/layouts/AdminLayout.jsx";
 import AuthLayout from "../pages/layouts/AuthLayout.jsx";
 import LoginPage from "../pages/Auth/LoginPage.jsx";
