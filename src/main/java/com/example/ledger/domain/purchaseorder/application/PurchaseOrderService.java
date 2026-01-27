@@ -6,6 +6,7 @@ import com.example.ledger.domain.partner.entity.PartnerStatus;
 import com.example.ledger.domain.partner.entity.PartnerType;
 import com.example.ledger.domain.partner.infra.PartnerRepository;
 import com.example.ledger.domain.product.entity.Product;
+import com.example.ledger.domain.product.entity.ProductStatus;
 import com.example.ledger.domain.product.infra.ProductRepository;
 import com.example.ledger.domain.purchaseorder.dto.command.POCreateCommand;
 import com.example.ledger.domain.purchaseorder.dto.request.Item;
@@ -15,6 +16,7 @@ import com.example.ledger.domain.purchaseorder.entity.PurchaseOrderItem;
 import com.example.ledger.domain.purchaseorder.infra.PurchaseOrderItemRepository;
 import com.example.ledger.domain.purchaseorder.infra.PurchaseOrderRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -37,6 +39,7 @@ public class PurchaseOrderService {
         this.partnerRepository = partnerRepository;
     }
 
+    @Transactional
     public POCreateResult create(POCreateCommand command) {
         Partner partner = partnerRepository.findById(command.getPartnerId())
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 거래처입니다."));
@@ -62,7 +65,7 @@ public class PurchaseOrderService {
             if (product.isDeleted()) {
                 throw new IllegalArgumentException("삭제된 상품은 발주할 수 없습니다.");
             }
-            if (product.getStatus() != com.example.ledger.domain.product.entity.ProductStatus.ACTIVE) {
+            if (product.getStatus() != ProductStatus.ACTIVE) {
                 throw new IllegalArgumentException("비활성 상품은 발주할 수 없습니다.");
             }
 

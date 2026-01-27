@@ -22,6 +22,11 @@ public class PurchaseOrderController {
         this.purchaseOrderService = purchaseOrderService;
     }
 
+    // 발주 생성 REQUESTED - purchase-orders post
+    // 발주 승인 APPROVED - purchase-orders patch - 멱등의 성질로
+    // 발주 취소 CANCELLED - purchase-orders patch - 멱등의 성질로
+    // 입고 완료 RECEIVED - purchase-orders patch - 멱등의 성질로
+
     @PostMapping
     public ResponseEntity<ApiResponse<POCreateResponse>> create(
             @RequestBody POCreateRequest request
@@ -35,7 +40,7 @@ public class PurchaseOrderController {
             unitCost < 0 인지(또는 null이면 허용할지 정책)
         */
         POCreateCommand command = new POCreateCommand(
-                request.getProductId(),
+                request.getPartnerId(),
                 request.getItems()
         );
         POCreateResult result = purchaseOrderService.create(command);

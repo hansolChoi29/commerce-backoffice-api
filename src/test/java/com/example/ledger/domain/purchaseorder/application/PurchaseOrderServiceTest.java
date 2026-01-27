@@ -16,6 +16,7 @@ import com.example.ledger.domain.purchaseorder.infra.PurchaseOrderRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -25,6 +26,7 @@ import static org.mockito.ArgumentMatchers.any;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 import static com.example.ledger.domain.product.entity.ProductStatus.ACTIVE;
@@ -49,42 +51,24 @@ class PurchaseOrderServiceTest {
     @InjectMocks
     PurchaseOrderService purchaseOrderService;
 
-//    @Test
-//    @DisplayName("발주서생성")
-//    void purchaseOrder_success() {
-//        POCreateCommand command = new POCreateCommand(
-//                10L,
-//                java.util.List.of(
-//                        new Item(1L, 10, new java.math.BigDecimal("5500"))
-//                )
-//        );
-//        // partner 잇다고 치고
-//        Partner partner = new Partner(
-//                10L,
-//                PartnerType.SUPPLIER,
-//                "name",
-//                PartnerStatus.ACTIVE,
-//                LocalDateTime.now()
-//        );
-//        // product statuc ACTIVE 라고 치고
-//        Product product = new Product(
-//                1L,
-//                "SKU-01234567891",
-//                "name",
-//                ACTIVE,
-//                BigDecimal.valueOf(12000),
-//                BigDecimal.valueOf(13000),
-//                LocalDateTime.now()
-//        );
-//        given(partnerRepository.findById(10L)).willReturn(Optional.of(partner));
-//        given(productRepository.findById(1L)).willReturn(Optional.of(product));
-//        PurchaseOrder saved = new PurchaseOrder();
-//
-//        given(purchaseOrderRepository.save(any(PurchaseOrder.class))).willReturn(saved);
-//        POCreateResult result = purchaseOrderService.create(command);
-//        assertThat(result);
-//        then(purchaseOrderRepository).should().save(any(PurchaseOrder.class));
-//        then(purchaseOrderItemRepository).should().save(any(PurchaseOrderItem.class));
-//    }
+    // 거래처가 SUPPLIER + ACTIVE고 아이템 상품이 deleted=false+ACTIVE면
+    // purchaseOrderRepository.save() 1회
+    // purchaseOrderItemRepository.save() 아이템 개수만큼
+    // 결과 POCreateResult가 saved 값 기반으로 반환
+
+    // 시나리오
+    // 1. 거래처 없음 - 예외, PO 저장도 하면 안 됨
+    // 2. 거래처 type != SUPPLIER - 예외, PO 저장도 하면 안 됨
+    // 3. 거래서 status != ACTIVE - 예외, PO 저장도 하면 안 됨
+    // 4. 상품 없음(아이템 중 하나) - 예외
+    // 5. 상품 deleted = true - 예외
+    // 6. 상품 status != ACTIVE - 예외
+
+    @Test
+    @DisplayName("발주 생성")
+    void purchaes_orders_success(){
+
+    }
+
 
 }

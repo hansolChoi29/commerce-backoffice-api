@@ -46,6 +46,8 @@ public class PurchaseOrder {
         PurchaseOrder order = new PurchaseOrder();
         order.partnerId = partnerId;
         order.poNo = poNo;
+        order.status = PurchaseOrderStatus.REQUESTED;
+        order.orderedAt = LocalDateTime.now();
         return order;
     }
 
