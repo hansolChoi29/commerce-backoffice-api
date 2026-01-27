@@ -3,8 +3,8 @@ package com.example.ledger.domain.purchaseorder.dto.request;
 import java.util.List;
 
 public class POCreateRequest {
-    private final Long productId;
-    private final List<Item> items;
+    private Long productId;
+    private List<Item> items;
 
     public POCreateRequest(Long productId, List<Item> items) {
         this.productId = productId;

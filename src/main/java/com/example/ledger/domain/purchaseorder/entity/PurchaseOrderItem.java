@@ -28,4 +28,49 @@ public class PurchaseOrderItem {
 
     @Column(name = "unit_cost", nullable = false)
     private BigDecimal unitCost; // 발주 단가 (매입 단가)
+
+    protected PurchaseOrderItem() {
+    }
+
+    public PurchaseOrderItem(Long id, Long purchaseOrderId, Long productId, int orderQty, BigDecimal unitCost) {
+        this.id = id;
+        this.purchaseOrderId = purchaseOrderId;
+        this.productId = productId;
+        this.orderQty = orderQty;
+        this.unitCost = unitCost;
+    }
+
+    public static PurchaseOrderItem create(
+            Long purchaseOrderId,
+            Long productId,
+            int orderQty,
+            BigDecimal unitCost
+    ) {
+        PurchaseOrderItem item = new PurchaseOrderItem();
+        item.purchaseOrderId = purchaseOrderId;
+        item.productId = productId;
+        item.orderQty = orderQty;
+        item.unitCost = unitCost;
+        return item;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public Long getPurchaseOrderId() {
+        return purchaseOrderId;
+    }
+
+    public Long getProductId() {
+        return productId;
+    }
+
+    public int getOrderQty() {
+        return orderQty;
+    }
+
+    public BigDecimal getUnitCost() {
+        return unitCost;
+    }
 }

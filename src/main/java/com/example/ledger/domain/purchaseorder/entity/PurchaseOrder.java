@@ -25,7 +25,47 @@ public class PurchaseOrder {
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false, length = 30)
     private PurchaseOrderStatus status;
-
     @Column(name = "ordered_at")
     private LocalDateTime orderedAt;
+
+    protected PurchaseOrder() {
+    }
+
+    public PurchaseOrder(Long id, String poNo, Long partnerId, PurchaseOrderStatus status, LocalDateTime orderedAt) {
+        this.id = id;
+        this.poNo = poNo;
+        this.partnerId = partnerId;
+        this.status = status;
+        this.orderedAt = orderedAt;
+    }
+
+    public static PurchaseOrder create(
+            Long partnerId,
+            String poNo
+    ) {
+        PurchaseOrder order = new PurchaseOrder();
+        order.partnerId = partnerId;
+        order.poNo = poNo;
+        return order;
+    }
+
+    public LocalDateTime getOrderedAt() {
+        return orderedAt;
+    }
+
+    public PurchaseOrderStatus getStatus() {
+        return status;
+    }
+
+    public Long getPartnerId() {
+        return partnerId;
+    }
+
+    public String getPoNo() {
+        return poNo;
+    }
+
+    public Long getId() {
+        return id;
+    }
 }

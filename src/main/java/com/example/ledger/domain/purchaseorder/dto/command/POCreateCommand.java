@@ -6,16 +6,16 @@ import com.example.ledger.domain.purchaseorder.dto.request.Item;
 import java.util.List;
 
 public class POCreateCommand {
-    private final Long productId;
+    private final Long partnerId;
     private final List<Item> items;
 
-    public POCreateCommand(Long productId, List<Item> items) {
-        this.productId = productId;
+    public POCreateCommand(Long partnerId, List<Item> items) {
+        this.partnerId = partnerId;
         this.items = items;
     }
 
-    public Long getProductId() {
-        return productId;
+    public Long getPartnerId() {
+        return partnerId;
     }
 
     public List<Item> getItems() {

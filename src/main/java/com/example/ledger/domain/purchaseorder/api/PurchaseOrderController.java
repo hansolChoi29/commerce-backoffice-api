@@ -26,6 +26,14 @@ public class PurchaseOrderController {
     public ResponseEntity<ApiResponse<POCreateResponse>> create(
             @RequestBody POCreateRequest request
     ) {
+         /*
+            partnerId가 null인지
+            items가 null/빈 리스트인지
+            각 item에
+            productId null인지
+            orderQty <= 0 인지
+            unitCost < 0 인지(또는 null이면 허용할지 정책)
+        */
         POCreateCommand command = new POCreateCommand(
                 request.getProductId(),
                 request.getItems()
@@ -37,6 +45,7 @@ public class PurchaseOrderController {
                 result.getStatus(),
                 result.getOrderedAt()
         );
+
         return ResponseEntity.ok(ApiResponse.ok("발주 신청이 완료되었습니다", response));
     }
 }
