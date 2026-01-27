@@ -18,6 +18,8 @@ import com.example.ledger.domain.purchaseorder.infra.PurchaseOrderItemRepository
 import com.example.ledger.domain.purchaseorder.infra.PurchaseOrderRepository;
 import com.example.ledger.global.exception.partner.PartnerErrorCode;
 import com.example.ledger.global.exception.partner.PartnerException;
+import com.example.ledger.global.exception.product.ProductErrorCode;
+import com.example.ledger.global.exception.product.ProductException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -60,13 +62,13 @@ public class PurchaseOrderService {
         List<Item> items = command.getItems();
         for (Item item : items) {
             Product product = productRepository.findById(item.getProductId())
-                    .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 상품입니다."));
+                    .orElseThrow(() -> new ProductException(ProductErrorCode.PRODUCT_NOT_FOUND));
 
             if (product.isDeleted()) {
-                throw new IllegalArgumentException("삭제된 상품은 발주할 수 없습니다.");
+                throw new ProductException(ProductErrorCode.PRODUCT_NOT_FOUND);
             }
             if (product.getStatus() != ProductStatus.ACTIVE) {
-                throw new IllegalArgumentException("비활성 상품은 발주할 수 없습니다.");
+                throw new ProductException(ProductErrorCode.PRODUCT_NO_STATUS);
             }
         }
         // 발주 1건 저장 -> 발주 품목 라인 n 저장
