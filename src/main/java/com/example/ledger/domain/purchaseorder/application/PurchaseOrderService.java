@@ -8,6 +8,7 @@ import com.example.ledger.domain.partner.infra.PartnerRepository;
 import com.example.ledger.domain.product.entity.Product;
 import com.example.ledger.domain.product.entity.ProductStatus;
 import com.example.ledger.domain.product.infra.ProductRepository;
+import com.example.ledger.domain.purchaseorder.application.pono.PoNoGenerator;
 import com.example.ledger.domain.purchaseorder.dto.command.POCreateCommand;
 import com.example.ledger.domain.purchaseorder.dto.request.Item;
 import com.example.ledger.domain.purchaseorder.dto.result.POCreateResult;
@@ -15,6 +16,8 @@ import com.example.ledger.domain.purchaseorder.entity.PurchaseOrder;
 import com.example.ledger.domain.purchaseorder.entity.PurchaseOrderItem;
 import com.example.ledger.domain.purchaseorder.infra.PurchaseOrderItemRepository;
 import com.example.ledger.domain.purchaseorder.infra.PurchaseOrderRepository;
+import com.example.ledger.global.exception.partner.PartnerErrorCode;
+import com.example.ledger.global.exception.partner.PartnerException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,41 +29,36 @@ public class PurchaseOrderService {
     private final ProductRepository productRepository;
     private final PurchaseOrderItemRepository purchaseOrderItemRepository;
     private final PartnerRepository partnerRepository;
+    private final PoNoGenerator poNoGenerator;
 
     public PurchaseOrderService(
             PurchaseOrderRepository purchaseOrderRepository,
             ProductRepository productRepository,
             PurchaseOrderItemRepository purchaseOrderItemRepository,
-            PartnerRepository partnerRepository
+            PartnerRepository partnerRepository,
+            PoNoGenerator poNoGenerator
     ) {
         this.purchaseOrderRepository = purchaseOrderRepository;
         this.productRepository = productRepository;
         this.purchaseOrderItemRepository = purchaseOrderItemRepository;
         this.partnerRepository = partnerRepository;
+        this.poNoGenerator = poNoGenerator;
     }
 
     @Transactional
     public POCreateResult create(POCreateCommand command) {
-        // [문제] 아이템 돌다가 예외나면 PO만 남는 부분저장이 생길 수 잇음
-        // 그래서 검증 먼저 하고 저장은 나중에 하자
         Partner partner = partnerRepository.findById(command.getPartnerId())
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 거래처입니다."));
+                .orElseThrow(() -> new PartnerException(PartnerErrorCode.PARTNER_NOT_FOUND));
 
         if (partner.getType() != PartnerType.SUPPLIER) {
-            throw new IllegalArgumentException("공급처만 발주할 수 있습니다.");
+            throw new PartnerException(PartnerErrorCode.PARTNER_NO_TYPE);
         }
         if (partner.getStatus() != PartnerStatus.ACTIVE) {
-            throw new IllegalArgumentException("비활성 거래처는 발주할 수 없습니다.");
+            throw new PartnerException(PartnerErrorCode.PARTNER_NO_STATUS);
         }
-
-        String poNo = generatePoNo();
-        PurchaseOrder saved = purchaseOrderRepository.save(
-                PurchaseOrder.create(partner.getId(), poNo)
-        );
 
         List<Item> items = command.getItems();
         for (Item item : items) {
-
             Product product = productRepository.findById(item.getProductId())
                     .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 상품입니다."));
 
@@ -70,14 +68,20 @@ public class PurchaseOrderService {
             if (product.getStatus() != ProductStatus.ACTIVE) {
                 throw new IllegalArgumentException("비활성 상품은 발주할 수 없습니다.");
             }
+        }
+        // 발주 1건 저장 -> 발주 품목 라인 n 저장
+        String poNo = poNoGenerator.generate();
+        PurchaseOrder saved = purchaseOrderRepository.save(
+                PurchaseOrder.create(partner.getId(), poNo)
+        );
 
+        for (Item item : items) {
             PurchaseOrderItem poItem = PurchaseOrderItem.create(
                     saved.getId(),
-                    product.getId(),
+                    item.getProductId(),
                     item.getOrderQty(),
                     item.getUnitCost()
             );
-
             purchaseOrderItemRepository.save(poItem);
         }
 
@@ -87,10 +91,5 @@ public class PurchaseOrderService {
                 saved.getStatus(),
                 saved.getOrderedAt()
         );
-    }
-
-    private String generatePoNo() {
-        // 임시: 나중에
-        return "PO-" + System.currentTimeMillis();
     }
 }
