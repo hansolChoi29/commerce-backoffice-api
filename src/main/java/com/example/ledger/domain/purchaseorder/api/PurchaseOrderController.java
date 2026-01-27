@@ -6,6 +6,7 @@ import com.example.ledger.domain.purchaseorder.dto.command.POCreateCommand;
 import com.example.ledger.domain.purchaseorder.dto.request.POCreateRequest;
 import com.example.ledger.domain.purchaseorder.dto.response.POCreateResponse;
 import com.example.ledger.domain.purchaseorder.dto.result.POCreateResult;
+import com.example.ledger.domain.purchaseorder.validation.PurchaseOrderValidation;
 import com.example.ledger.global.response.ApiResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -17,8 +18,13 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/purchase-orders")
 public class PurchaseOrderController {
     private final PurchaseOrderService purchaseOrderService;
+    private final PurchaseOrderValidation purchaseOrderValidation;
 
-    public PurchaseOrderController(PurchaseOrderService purchaseOrderService) {
+    public PurchaseOrderController(
+            PurchaseOrderService purchaseOrderService,
+            PurchaseOrderValidation purchaseOrderValidation
+    ) {
+        this.purchaseOrderValidation = purchaseOrderValidation;
         this.purchaseOrderService = purchaseOrderService;
     }
 
@@ -31,14 +37,8 @@ public class PurchaseOrderController {
     public ResponseEntity<ApiResponse<POCreateResponse>> create(
             @RequestBody POCreateRequest request
     ) {
-         /*
-            partnerId가 null인지
-            items가 null/빈 리스트인지
-            각 item에
-            productId null인지
-            orderQty <= 0 인지
-            unitCost < 0 인지(또는 null이면 허용할지 정책)
-        */
+        purchaseOrderValidation.validate(request);
+
         POCreateCommand command = new POCreateCommand(
                 request.getPartnerId(),
                 request.getItems()

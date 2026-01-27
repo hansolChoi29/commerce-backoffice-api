@@ -41,6 +41,8 @@ public class PurchaseOrderService {
 
     @Transactional
     public POCreateResult create(POCreateCommand command) {
+        // [문제] 아이템 돌다가 예외나면 PO만 남는 부분저장이 생길 수 잇음
+        // 그래서 검증 먼저 하고 저장은 나중에 하자
         Partner partner = partnerRepository.findById(command.getPartnerId())
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 거래처입니다."));
 
