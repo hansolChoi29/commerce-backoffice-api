@@ -3,16 +3,16 @@ package com.example.ledger.domain.purchaseorder.api;
 
 import com.example.ledger.domain.purchaseorder.application.PurchaseOrderService;
 import com.example.ledger.domain.purchaseorder.dto.command.POCreateCommand;
+import com.example.ledger.domain.purchaseorder.dto.command.POFindOneCommand;
 import com.example.ledger.domain.purchaseorder.dto.request.POCreateRequest;
 import com.example.ledger.domain.purchaseorder.dto.response.POCreateResponse;
+import com.example.ledger.domain.purchaseorder.dto.response.POFindOneResponse;
 import com.example.ledger.domain.purchaseorder.dto.result.POCreateResult;
+import com.example.ledger.domain.purchaseorder.dto.result.POFindOneResult;
 import com.example.ledger.domain.purchaseorder.validation.PurchaseOrderValidation;
 import com.example.ledger.global.response.ApiResponse;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/purchase-orders")
@@ -52,5 +52,21 @@ public class PurchaseOrderController {
         );
 
         return ResponseEntity.ok(ApiResponse.ok("발주 신청이 완료되었습니다", response));
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<ApiResponse<POFindOneResponse>> findOne(
+            @PathVariable Long id
+    ) {
+        POFindOneCommand command = new POFindOneCommand(id);
+        POFindOneResult result = purchaseOrderService.findOne(command);
+        POFindOneResponse response = new POFindOneResponse(
+                result.getPurhaseOrderId(),
+                result.getPoNo(),
+                result.getStatus(),
+                result.getOrderedAt(),
+                result.getItems()
+        );
+        return ResponseEntity.ok(ApiResponse.ok("발주서를 불러왔습니다.", response));
     }
 }

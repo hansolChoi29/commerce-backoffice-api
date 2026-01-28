@@ -10,12 +10,16 @@ import com.example.ledger.domain.product.entity.ProductStatus;
 import com.example.ledger.domain.product.infra.ProductRepository;
 import com.example.ledger.domain.purchaseorder.application.pono.PoNoGenerator;
 import com.example.ledger.domain.purchaseorder.dto.command.POCreateCommand;
+import com.example.ledger.domain.purchaseorder.dto.command.POFindOneCommand;
 import com.example.ledger.domain.purchaseorder.dto.request.Item;
 import com.example.ledger.domain.purchaseorder.dto.result.POCreateResult;
+import com.example.ledger.domain.purchaseorder.dto.result.POFindOneResult;
 import com.example.ledger.domain.purchaseorder.entity.PurchaseOrder;
 import com.example.ledger.domain.purchaseorder.entity.PurchaseOrderItem;
 import com.example.ledger.domain.purchaseorder.infra.PurchaseOrderItemRepository;
 import com.example.ledger.domain.purchaseorder.infra.PurchaseOrderRepository;
+import com.example.ledger.global.exception.PurchaseOrders.PurchaseOrdersErrorCode;
+import com.example.ledger.global.exception.PurchaseOrders.PurchaseOrdersException;
 import com.example.ledger.global.exception.partner.PartnerErrorCode;
 import com.example.ledger.global.exception.partner.PartnerException;
 import com.example.ledger.global.exception.product.ProductErrorCode;
@@ -92,6 +96,21 @@ public class PurchaseOrderService {
                 saved.getPoNo(),
                 saved.getStatus(),
                 saved.getOrderedAt()
+        );
+    }
+
+
+    public POFindOneResult findOne(POFindOneCommand command) {
+        PurchaseOrder order = purchaseOrderRepository.findById(command.getId())
+                .orElseThrow(() -> new PurchaseOrdersException(PurchaseOrdersErrorCode.PURCHASEORDER_ID_NOT_FOUND));
+        PurchaseOrderItem item =
+                purchaseOrderItemRepository.findById(command.getId()).orElseThrow(() -> new PurchaseOrdersException(PurchaseOrdersErrorCode.PURCHASEORDER_ID_NOT_FOUND));
+        return new POFindOneResult(
+                order.getId(),
+                order.getPoNo(),
+                order.getStatus(),
+                order.getOrderedAt(),
+                List.of(new Item(item.getProductId(), item.getOrderQty(), item.getUnitCost()))
         );
     }
 }
